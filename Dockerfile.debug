@@ -1,0 +1,14 @@
+# Use the official .NET SDK image as a base image for development
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the source code into the container
+COPY ./src /app
+
+# Install additional development-time dependencies if needed
+# RUN apt-get update && apt-get install -y some-development-package
+
+# Specify the entry point for development
+ENTRYPOINT ["dotnet", "watch", "run"]

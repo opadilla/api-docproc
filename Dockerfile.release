@@ -1,0 +1,27 @@
+# Use the official .NET Runtime image as a base image for production
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime-env
+
+# Set the working directory in the container
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY *.sln .
+COPY ./src ./src/
+RUN dotnet restore
+
+# copy everything else and build app
+WORKDIR ./src/Integrify.DocProcApi
+RUN cp -f Integrify.DocProcApi.csproj-prod Integrify.DocProcApi.csproj 
+RUN dotnet publish -c release -o /app --no-restore
+# COPY package* /app/
+# COPY runTests.js /app/
+# COPY testSetup.sh /app/
+# COPY imageinfo.json /app/
+# COPY ./test /app/test/
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+WORKDIR /app
+COPY --from=build /app ./
+ENTRYPOINT ["dotnet", "Integrify.DocProcApi.dll"]
